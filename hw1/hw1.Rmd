@@ -1,0 +1,134 @@
+---
+title: "hw1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+library(MASS)
+library(fBasics)
+OACs <- read.table("OACs.txt", header=TRUE)
+attach(OACs)
+fit_1 <- lm(GPA ~ Best.6, OACs)
+plot(Best.6, GPA)
+abline(fit_1)
+summary(fit_1)
+
+
+fit_2 <- lm(GPA ~ B4.E.C, OACs)
+plot(GPA ~ B4.E.C)
+abline(fit_2)
+summary(fit_2)
+
+
+fit_3 <- lm(B4.E.C ~ Best.6, OACs)
+plot(B4.E.C ~ Best.6)
+abline(fit_3)
+summary(fit_3)
+
+```
+
+detach()
+
+```{r}
+library(MASS)
+library(fBasics)
+
+Gas <- read.table("gas_consumption.txt", header=TRUE)
+attach(Gas)
+
+# 1
+fit <- lm(Gas.CCF ~ DegreesBelow65)
+plot(Gas.CCF ~ DegreesBelow65)
+abline(fit)
+summary(fit)
+
+
+# 2
+xy <- data.frame(X=DegreesBelow65)
+
+
+yhat <- predict(fit, newdata=xy, interval="confidence")
+ci <- data.frame(lower=yhat[,"lwr"], upper=yhat[,"upr"])
+
+yhat.pi <- predict(fit, newdata=xy, interval="prediction")
+pi <- data.frame(lower=yhat.pi[,"lwr"], upper=yhat.pi[,"upr"])
+plot(DegreesBelow65,Gas.CCF, main ="Confidence and Prediction Intervals",
+	ylab = "Gas.CCF", 
+	xlab = "DegreesBelow65")
+abline(fit)
+lines(xy$X, ci$lower, lty=2, col="red")
+lines(xy$X, ci$upper, lty=2, col="red")
+lines(xy$X, pi$lower, lty=2, col="blue")
+lines(xy$X, pi$upper, lty=2, col="blue")
+
+
+```
+detach()
+```{r}
+
+Car = read.table("car_accident.txt", header = TRUE)
+attach(Car)
+pairs(Car, panel=function(x,y) # 加回歸線
+	{abline(lsfit(x,y)$coef, lwd=1); points(x,y)})
+
+Carssq = Cars^2
+Speedsq = Speed^2
+
+car.full <- lm(Accidents ~ Cars+Speed)
+car.1 <- lm(Accidents ~ Cars)
+car.2 <- lm(Accidents ~ Speed)
+summary(car.full)
+summary(car.1)
+summary(car.2)
+
+car.log1 <- lm(Accidents ~ log(Cars))
+car.square1 <- lm(Accidents ~ Carssq)
+car.expo1 <- lm(Accidents ~ exp(Cars))
+summary(car.1)
+summary(car.log1)
+summary(car.square1)
+summary(car.expo1)
+
+car.log2 <- lm(Accidents ~ log(Speed))
+car.square2 <- lm(Accidents ~ Speedsq)
+car.expo2 <- lm(Accidents ~ exp(Speed))
+summary(car.2)
+summary(car.log2)
+summary(car.square2)
+summary(car.expo2)
+
+car.hope <- lm(Accidents ~ Cars+Speed+log(Speed)+Speedsq)
+summary(car.hope)
+
+car.hop1 <- lm(Accidents ~ Cars+Speed+log(Speed))
+summary(car.hop1)
+
+Cars_x_Speed <- Cars*Speed
+
+car.hop2 <- lm(Accidents ~ Cars+Speed+Cars_x_Speed)
+summary(car.hop2)
+```

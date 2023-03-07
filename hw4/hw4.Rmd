@@ -1,0 +1,88 @@
+---
+title: "hw4"
+author: "Arthur"
+date: "2021/12/20"
+output: html_document
+---
+```{r}
+library(Sleuth2)
+y <- c(83,72,3,14)					# listed by row
+smoker <- gl(2,2,4, c("Yes","No"))			# row names
+patient <- gl(2,1,4, c("Cancer","Control"))	# col names
+	# case1803 <- data.frame(y, smoker, patient)
+( case1803 <- xtabs(y ~ smoker + patient) )
+
+fisher.test(case1803, alternative="greater")
+
+
+
+```
+
+
+```{r}
+case1902
+logit = log((Death+0.5)/(Nodeath+0.5))
+# plot(logit~Aggravation, Victim="White")
+# plot(logit~Aggravation, Victim="Black")
+plot(c(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6), logit, type="n", xlab="Aggravation", ylab="logit")
+points(Aggravation, logit, pch=ifelse(Victim=="White", 1, 16))
+lines(Aggravation[Victim=="White"], logit[Victim=="White"], lty=2)
+lines(Aggravation[Victim=="Black"], logit[Victim=="Black"], lty=1)
+legend(1,2, legend=c("White","Black"), pch=c(1,16))
+# plot(logit~Aggravation)
+```
+
+```{r}
+# attach(case1902)
+# c1902 <- xtabs(cbind(Death, Nodeath)~Victim)
+
+```
+
+
+```{r}
+Death_pro = Death/(Death+Nodeath)
+case1902.lg1 <- glm(logit~factor(Aggravation) + Victim)
+summary(case1902.lg1)
+```
+
+```{r}
+c1902.lg1 <- glm(cbind(Death, Nodeath)~Aggravation+Victim, binomial)
+summary(c1902.lg1)
+
+	eta <- c2101.lg1$coef[1]+c2101.lg1$coef[2]*log(Area)
+	exp(eta)/(1+exp(eta))
+
+# Display 21.5
+Death_pro = Death/(Death+Nodeath)
+( pihat <- fitted(c1902.lg1) )	# the fitted mean values, 
+						# obtained by transforming the linear predictors 
+						# by the inverse of the link function.
+( rawres <- Death_pro - pihat )
+
+( respea <- residuals(c1902.lg1, type="pearson") )
+( resdev <- residuals(c1902.lg1, type="deviance") )
+
+cbind(Death_pro, pihat, rawres, respea, resdev)
+
+
+# Display 21.2
+logit1902 <- log(Death_pro/(1-Death_pro))
+plot(log(Area), logit2101, pch=20)
+
+
+# Goodness-of-Fit: Deviance (Gsq)
+deviance(case1902.lg1)	# = sum(resdev^2) = c2101.lg1$deviance
+case1902.lg1$df.residual
+1-pchisq(deviance(case1902.lg1), case1902.lg1$df.residual)
+
+# Goodness-of-Fit: Pearson (Xsq)
+( Xsq <- sum(respea^2) )
+1-pchisq(Xsq, df=c2101.lg1$df.residual)
+
+
+# Wald's Test & C.I. for beta_1
+confint(case1902.lg1)
+
+# LRT / Drop-in-Deviance Test for beta_1 (p. 13-21)
+1-pchisq(c2101.lg1$null.deviance-deviance(c2101.lg1), 1)
+```

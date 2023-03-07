@@ -1,0 +1,109 @@
+---
+title: "hw2"
+author: "Arthur"
+date: "2021/11/1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+library("ggplot2")
+
+GoodBelly <- read.table("GoodBelly_data.csv",  quote = "", header=TRUE, sep=",") 
+GoodBelly <- data.frame(GoodBelly)
+
+# a. descriptive statistics , Exploratory Data Analysis (EDA)
+## 1. Summarizing data
+attach(GoodBelly)
+
+hist(UnitsSold)
+hist(AverageRetailPrice)
+boxplot(UnitsSold, main="Boxplot of UnitsSold")
+boxplot(AverageRetailPrice, main="Boxplot of AverageRetailPrice")
+
+region_factor <- Region
+region_factor <- factor(Region)
+region_factor <- as.numeric(region_factor)
+region_factor[is.na(region_factor)] <- 8
+# for (i in 0:length(GoodBelly[["Region"]]))
+#   GoodBelly[["Region"]][i] <- as.character(region_factor[i])
+
+GoodBelly[["Region"]][is.na(GoodBelly[["Region"]])] <- "NA"
+Region[is.na(Region)] <- "NA"
+
+
+GBPlot <- ggplot(GoodBelly[1:781, ], aes(AverageRetailPrice, UnitsSold, shape = Region, colour = SalesRep)) + geom_point() 
+print(GBPlot)
+
+GBPlot_2 <- ggplot(GoodBelly[782:1386, ], aes(AverageRetailPrice, UnitsSold, shape = Region, colour = SalesRep)) + geom_point() 
+print(GBPlot_2)
+
+GBPlot_3 <- ggplot(GoodBelly[1:781, ], aes(AverageRetailPrice, UnitsSold, shape = Region, colour = Endcap)) + geom_point() 
+print(GBPlot_3)
+
+GBPlot_4 <- ggplot(GoodBelly[782:1386, ], aes(AverageRetailPrice, UnitsSold, shape = Region, colour = Endcap)) + geom_point() 
+print(GBPlot_4)
+
+GBPlot_5 <- ggplot(GoodBelly[1:781, ], aes(AverageRetailPrice, UnitsSold, shape = Region, colour = Demo+Demo1.3+Demo4.5)) + geom_point() 
+print(GBPlot_5)
+
+GBPlot_6 <- ggplot(GoodBelly[782:1386, ], aes(AverageRetailPrice, UnitsSold, shape = Region, colour = Demo+Demo1.3+Demo4.5)) + geom_point() 
+print(GBPlot_6)
+
+```
+
+```{r}
+
+lm_sales_pro <- lm(UnitsSold ~ Endcap)
+summary(lm_sales_pro)
+
+lm_sales_demo <- lm(UnitsSold ~ Demo+Demo1.3+Demo4.5)
+summary(lm_sales_demo)
+
+
+lm_sales_price <- lm(UnitsSold ~ AverageRetailPrice)
+summary(lm_sales_price)
+
+lm_sales_region_1 <- lm(UnitsSold ~ Region)
+summary(lm_sales_region_1)
+
+
+print(ggplot(GoodBelly, aes(AverageRetailPrice, UnitsSold))) + geom_point()
+
+print(ggplot(GoodBelly, aes(Date, UnitsSold, colour=Region))) + geom_point()
+
+```
+
+```{r}
+lm_sales_all <- lm(UnitsSold ~ Region+AverageRetailPrice+SalesRep+Endcap+Demo+Demo1.3+Demo4.5+Natural+Fitness)
+summary(lm_sales_all)
+
+lm_sales_less <- lm(UnitsSold ~ Region+AverageRetailPrice+SalesRep+Endcap+Demo+Demo1.3+Demo4.5)
+summary(lm_sales_less)
+
+anova(lm_sales_less, lm_sales_all)
+
+```

@@ -1,0 +1,108 @@
+---
+title: "HW3"
+author: "Arthur"
+date: "2021/11/22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+oat <- read.table("oatvar.txt", header=TRUE, sep = '\t')
+summary(oat)
+attach(oat)
+
+# Interaction plots：In both cases the lines are not parallel, indicating interaction.
+par(mfrow=c(1,2))
+with(oat, interaction.plot(block, variety, yield, legend=F))
+with(oat, interaction.plot(variety, block, yield, legend=F))
+
+variety0 <- factor(variety, order=FALSE)
+block <- factor(block, order=FALSE)
+oat_lm_1 <- lm(yield ~ variety0, data =  oat)
+
+summary(oat_lm_1)
+
+oat_tuk <- TukeyHSD(aov(yield ~ variety))
+plot(oat_tuk) ## 看起來沒差 => 再次證明沒差
+
+# Diagnostics
+plot(fitted(oat_lm_1), residuals(oat_lm_1), xlab="Fitted", ylab="Residuals"); abline(h=0, lty=3)
+qqnorm(residuals(oat_lm_1)); qqline(residuals(oat_lm_1))
+
+
+```
+
+```{r}
+deter <- read.table("detergent.txt", header = TRUE, sep = "\t")
+attach(deter)
+
+boxplot(Score ~ factor(Detergent))
+
+deter_lm <- lm(Score ~ factor(Detergent) + factor(Temperature), deter)
+
+deter_tuk_1 <- TukeyHSD(aov(Score~Detergent, deter))
+plot(deter_tuk_1)
+
+deter_tuk_2 <- TukeyHSD(aov(Score~Temperature, deter))
+plot(deter_tuk_2)
+
+# Interaction plots：In both cases the lines are not parallel, indicating interaction.
+par(mfrow=c(1,2))
+with(deter, interaction.plot(Detergent, Temperature, Score, legend=F))
+with(deter, interaction.plot(Temperature, Detergent, Score, legend=F))
+
+
+```
+
+
+```{r}
+
+car <- read.table("used_bmw.txt", header=TRUE, sep = "\t")
+attach(car)
+plot(car)
+
+plot(Mileage, ResidualPrice)
+
+car_lm <- lm(ResidualPrice ~ Age + Mileage, car)
+
+summary(car_lm)
+
+plot(fitted(car_lm), residuals(car_lm), xlab="Fitted", ylab="Residuals"); abline(h=0, lty=3)
+qqnorm(residuals(car_lm)); qqline(residuals(car_lm))
+
+confint(car_lm)
+
+
+
+```
+
+
+
+
+
+
+
+
